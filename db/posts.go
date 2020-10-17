@@ -84,3 +84,23 @@ func CreatePost(title, body, author string, published bool) bool {
 
 	return true
 }
+
+func AllPosts() []Post {
+
+	rows, err := db.Query("SELECT * FROM posts")
+	if err != nil {
+		panic(err.Error())
+	}
+	post := Post{}
+	res := []Post{}
+	for rows.Next() {
+		err = rows.Scan(&post.ID, &post.Title, &post.Slug, &post.Body, &post.Author, &post.Published)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		res = append(res, post)
+	}
+
+	return res
+}
