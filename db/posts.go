@@ -124,6 +124,41 @@ func GetPost(id int) (bool, Post) {
 	return false, post
 }
 
+func UpdatePost(id int, title, body, author string, published bool) bool {
+
+	// Title
+	title = strings.ReplaceAll(title, "\n", "")
+
+	// Slug
+	slug := strings.ReplaceAll(title, " ", "-")
+	slug = strings.ToLower(slug)
+
+	// Body
+	body = strings.ReplaceAll(body, "\n", "")
+
+	// Author
+	author = strings.ReplaceAll(author, "\n", "")
+
+	// SQL Statement
+	stmt, err := db.Prepare("UPDATE posts SET title=?, slug=?, body=?, AUTHOR=?, published=? WHERE id=?;")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// Query Execution
+	res, err := stmt.Exec(title, slug, body, author, published, id)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	_, err = res.RowsAffected()
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return true
+}
+
 func DeletePost(id int) bool {
 
 	// SQL Statement
