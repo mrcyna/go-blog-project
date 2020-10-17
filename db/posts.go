@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"strconv"
 	"strings"
 	"time"
 
@@ -103,4 +104,44 @@ func AllPosts() []Post {
 	}
 
 	return res
+}
+
+func GetPost(id int) (bool, Post) {
+	rows, err := db.Query("SELECT * FROM posts WHERE id = " + strconv.Itoa(id))
+	if err != nil {
+		panic(err.Error())
+	}
+	post := Post{}
+	for rows.Next() {
+		err = rows.Scan(&post.ID, &post.Title, &post.Slug, &post.Body, &post.Author, &post.Published)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		return true, post
+	}
+
+	return false, post
+}
+
+func DeletePost(id int) bool {
+
+	// SQL Statement
+	stmt, err := db.Prepare("DELETE FROM posts WHERE id = ?")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// Query Execution
+	res, err := stmt.Exec(id)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	_, err = res.RowsAffected()
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return true
 }
